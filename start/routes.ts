@@ -24,3 +24,5 @@ import Route from '@ioc:Adonis/Core/Route'
 Route.post('/register', 'UsersController.register')
 
 Route.post('/login', 'UsersController.login')
+
+Route.post('/addfriend/:friend_id', 'UsersController.addFriend')
