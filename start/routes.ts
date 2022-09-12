@@ -18,11 +18,20 @@
 |
 */
 
-import { Request } from '@adonisjs/core/build/standalone'
+
 import Route from '@ioc:Adonis/Core/Route'
+import UsersController from 'App/Controllers/Http/UsersController'
 
 Route.post('/register', 'UsersController.register')
 
 Route.post('/login', 'UsersController.login')
 
-Route.post('/addfriend/:friend_id', 'UsersController.addFriend')
+Route.post('/addfriend/:friend_id', 'UsersController.addFriend').middleware('auth')
+
+Route.get('/users/me', 'UsersController.me').middleware('auth')
+
+Route.delete('/deletefriend/:friend_id', 'UsersController.deletefriend').middleware('auth')
+
+Route.post('/logout', 'UsersController.logout').middleware('auth')
+
+Route.get('/friendslist', 'UsersController.friendsList').middleware('auth')
