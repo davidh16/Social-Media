@@ -5,9 +5,9 @@ export default class extends BaseSchema {
 
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('friendship_id').primary()
-      table.integer('user_id').references('users.id').onDelete('CASCADE')
-      table.integer('friend_id').references('users.id').onDelete('CASCADE')
+      table.increments('friendshipId').primary()
+      table.integer('userId').references('users.id').onDelete('CASCADE')
+      table.integer('friendId').references('users.id').onDelete('CASCADE')
     })
   }
 

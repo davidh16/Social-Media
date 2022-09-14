@@ -8,21 +8,21 @@ import { Response } from '@adonisjs/core/build/standalone'
 
 export default class UsersController {
     public async register({ request, response }: HttpContextContract) {
-        const new_user = new User()
-        new_user.name = request.body().name
-        new_user.surname = request.body().surname
-        new_user.email = request.body().email
-        new_user.password = request.body().password
-        new_user.validated = false
-        await new_user.save()
-        const registeredUser = await User.query().where('email', new_user.email).firstOrFail()
+        const newUser = new User()
+        newUser.name = request.body().name
+        newUser.surname = request.body().surname
+        newUser.email = request.body().email
+        newUser.password = request.body().password
+        newUser.validated = false
+        await newUser.save()
+        const registeredUser = await User.query().where('email', newUser.email).firstOrFail()
         await Mail.send((message) => {
             message
                 .from('socialmedia@example.com')
-                .to(new_user.email)
+                .to(newUser.email)
                 .subject('Validation')
                 .htmlView('validation', {
-                    user: { name: new_user.name },
+                    user: { name: newUser.name },
                     url: `localhost:3333/validation/${registeredUser.id}`
                 })
         })
@@ -38,12 +38,12 @@ export default class UsersController {
     }
 
     public async login({ auth, request, response }: HttpContextContract) {
-        const current_user = await User.findByOrFail('email', request.body().email)
-        if (current_user.validated == false){
+        const currentUser = await User.findByOrFail('email', request.body().email)
+        if (currentUser.validated === false){
             return response.unauthorized('Validation of email adress is needed')
         }
-        if (current_user.password == request.body().password) {
-            const token = await auth.use('api').generate(current_user, {
+        if (currentUser.password === request.body().password) {
+            const token = await auth.use('api').generate(currentUser, {
                 expiresIn: '8 hours'
             })
             return token.toJSON()
@@ -56,13 +56,13 @@ export default class UsersController {
     public async addFriend({ user, params, response }) {
         const friend = await User.findByOrFail('id', params.friend_id)
         const existance = await Friendship.query().where('user_id', user.id).andWhere('friend_id', friend.id).first()
-        if (existance || (user.id == params.friend_id) || (friend.validated = false)){
+        if (existance || (user.id === params.friend_id) || (friend.validated = false)){
             return response.forbidden()
         }
-        const new_friendship = new Friendship()
-        new_friendship.user_id = user.id 
-        new_friendship.friend_id = friend.id
-        await new_friendship.save()
+        const newFriendship = new Friendship()
+        newFriendship.userId = user.id 
+        newFriendship.friendId = friend.id
+        await newFriendship.save()
         return response.notFound()
     }
 
@@ -100,7 +100,7 @@ export default class UsersController {
         const new_post = new Post()
         new_post.description = request.input('description')
         new_post.likes = 0
-        new_post.user_id = user.id
+        new_post.userId = user.id
         const image = request.file('image')
         if (image){
             let imageName = 'image' + '.' + `${image.extname}`
