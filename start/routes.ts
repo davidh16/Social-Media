@@ -35,3 +35,7 @@ Route.delete('/deletefriend/:friend_id', 'UsersController.deletefriend').middlew
 Route.post('/logout', 'UsersController.logout').middleware('auth')
 
 Route.get('/friendslist', 'UsersController.friendsList').middleware('auth')
+
+Route.post('/post', 'UsersController.post').middleware('auth')
+
+Route.get('/validation/:userId', 'UsersController.validate')
