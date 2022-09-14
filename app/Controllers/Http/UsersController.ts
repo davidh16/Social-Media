@@ -27,7 +27,7 @@ export default class UsersController {
                 })
         })
 
-        return response.status(200)
+        return response.ok('User registered')
     }
 
     public async validate({params,response}:HttpContextContract){
@@ -53,17 +53,17 @@ export default class UsersController {
         }
     }
 
-    public async addFriend({ auth, params, response }) {
+    public async addFriend({ user, params, response }) {
         const friend = await User.findByOrFail('id', params.friend_id)
-        const existance = Friendship.query().where('user_id', auth.user.id).andWhere('friend_id', friend.id).first()
-        if (await existance){
-            return response.status(409)
+        const existance = await Friendship.query().where('user_id', user.id).andWhere('friend_id', friend.id).first()
+        if (existance || (user.id == params.friend_id) || (friend.validated = false)){
+            return response.forbidden()
         }
         const new_friendship = new Friendship()
-        new_friendship.user_id = auth.user.id 
+        new_friendship.user_id = user.id 
         new_friendship.friend_id = friend.id
         await new_friendship.save()
-        return response.status(200)
+        return response.notFound()
     }
 
     public async me({ user, response }: HttpContextContract){
@@ -73,10 +73,10 @@ export default class UsersController {
     public async deletefriend({ user, response, params }: HttpContextContract){
         const friendship = await Friendship.query().where('friend_id', params.friend_id).andWhere('user_id', user.id).first()
         if (!friendship){
-            return response.status(404)
+            return response.notFound()
         }
         friendship.delete()
-        return response.status(404)
+        return response.notFound()
     }
 
     public async logout({auth}:HttpContextContract){
@@ -122,6 +122,15 @@ export default class UsersController {
         }
         await new_post.save()
         return response.ok(new_post)
+    }
+
+    public async like({params, response}:HttpContextContract){
+        const likedPost = await Post.findByOrFail('post_id', params.post_id)
+        likedPost.likes++
+        await likedPost.save()
+        return response.ok("Liked")
+        //potrebno ograničiti usera da može lajkati samo jednom
+        //potencijalno ograničiti usera da može lajkati samo postove svojih prijatelja
     }
 
     }

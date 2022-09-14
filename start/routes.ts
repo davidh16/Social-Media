@@ -38,4 +38,6 @@ Route.get('/friendslist', 'UsersController.friendsList').middleware('auth')
 
 Route.post('/post', 'UsersController.post').middleware('auth')
 
+Route.put('/like/:post_id', 'UsersController.like').middleware('auth')
+
 Route.get('/validation/:userId', 'UsersController.validate')
