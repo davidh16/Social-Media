@@ -25,6 +25,7 @@ export default class UsersController {
                     user: { name: newUser.name },
                     url: `localhost:3333/validation/${registeredUser.id}`
                 })
+                //doraditi htmlView tako da click here otvara novi tab, odnosno da salje get request
         })
 
         return response.ok('User registered')
@@ -51,19 +52,23 @@ export default class UsersController {
         else {
             return response.unauthorized('Invalid credentials')
         }
+        //treba omogućiti login preko social auth
     }
 
     public async addFriend({ user, params, response }) {
         const friend = await User.findByOrFail('id', params.friend_id)
         const existance = await Friendship.query().where('user_id', user.id).andWhere('friend_id', friend.id).first()
-        if (existance || (user.id === params.friend_id) || (friend.validated = false)){
+        if (existance || (user.id === friend.id)){
             return response.forbidden()
+        }
+        if(friend.validated === false){
+            return response.notFound()
         }
         const newFriendship = new Friendship()
         newFriendship.userId = user.id 
         newFriendship.friendId = friend.id
         await newFriendship.save()
-        return response.notFound()
+        return response.ok(`${friend.name} has been added as a friend`)
     }
 
     public async me({ user, response }: HttpContextContract){
@@ -76,7 +81,7 @@ export default class UsersController {
             return response.notFound()
         }
         friendship.delete()
-        return response.notFound()
+        return response.ok("Friend deleted")
     }
 
     public async logout({auth}:HttpContextContract){
@@ -86,15 +91,11 @@ export default class UsersController {
         }
     }
 
-//     public async friendsList({user}){
-//         //const friendsList = await (await Friendship.query().select('friend_id').where('user_id', user.id))
-//         //return friendsList
-        
-
-//         // const friends = await Friendship.query().preload('friend_id')
-//         // friends.forEach((friend) => {
-//         //     console.log(friend.user_id)
-// })
+    public async friendsList({user}){
+        const friendsList = await Friendship.query().select('friend_id').where('user_id', user.id)
+        return friendsList
+        //potrebno dovršiti
+    }
 
     public async post({request, response, user}:HttpContextContract){
         const new_post = new Post()
