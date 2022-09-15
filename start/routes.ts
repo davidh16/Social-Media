@@ -20,7 +20,6 @@
 
 
 import Route from '@ioc:Adonis/Core/Route'
-import UsersController from 'App/Controllers/Http/UsersController'
 
 Route.post('/register', 'UsersController.register')
 

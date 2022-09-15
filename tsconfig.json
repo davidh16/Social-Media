@@ -34,7 +34,9 @@
       "@adonisjs/redis",
       "@adonisjs/drive-s3",
       "@adonisjs/mail",
-      "@adonisjs/view"
+      "@adonisjs/view",
+      "@adonisjs/ally",
+      "@adonisjs/limiter"
     ]
   }
 }

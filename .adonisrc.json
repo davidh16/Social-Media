@@ -16,7 +16,8 @@
   },
   "preloads": [
     "./start/routes",
-    "./start/kernel"
+    "./start/kernel",
+    "./start/limiter"
   ],
   "providers": [
     "./providers/AppProvider",
@@ -26,7 +27,9 @@
     "@adonisjs/redis",
     "@adonisjs/drive-s3",
     "@adonisjs/mail",
-    "@adonisjs/view"
+    "@adonisjs/view",
+    "@adonisjs/ally",
+    "@adonisjs/limiter"
   ],
   "aceProviders": [
     "@adonisjs/repl"

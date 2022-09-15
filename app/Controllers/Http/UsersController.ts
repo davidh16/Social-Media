@@ -2,8 +2,8 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User'
 import Friendship from 'App/Models/Friendship'
 import Post from 'App/Models/Post'
-import Drive from '@ioc:Adonis/Core/Drive'
 import Mail from '@ioc:Adonis/Addons/Mail'
+
 
 export default class UsersController {
     public async register({ request, response }: HttpContextContract) {
@@ -36,7 +36,7 @@ export default class UsersController {
         return response.ok("Validation successful")
     }
 
-    public async login({ auth, request, response }: HttpContextContract) {
+    public async login({ auth, request, response}: HttpContextContract) {
         const currentUser = await User.findByOrFail('email', request.body().email)
         if (currentUser.validated === false){
             return response.unauthorized('Validation of email adress is needed')
@@ -100,7 +100,7 @@ export default class UsersController {
         new_post.userId = user.id
         const image = request.file('image')
         if (image){
-            await image.moveToDisk('')
+            await image!.moveToDisk('')
             new_post.image = image.fileName
         }
         await new_post.save()
