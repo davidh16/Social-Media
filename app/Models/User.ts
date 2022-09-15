@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
-import Friendship from './Friendship'
-import Post from './Post'
+import Friendship from 'App/Models/Friendship'
+import Post from 'App/Models/Post'
 
 export default class User extends BaseModel {
   @hasMany(() => Friendship)

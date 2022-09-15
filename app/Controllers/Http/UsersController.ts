@@ -4,7 +4,6 @@ import Friendship from 'App/Models/Friendship'
 import Post from 'App/Models/Post'
 import Drive from '@ioc:Adonis/Core/Drive'
 import Mail from '@ioc:Adonis/Addons/Mail'
-import { Response } from '@adonisjs/core/build/standalone'
 
 export default class UsersController {
     public async register({ request, response }: HttpContextContract) {
@@ -23,9 +22,8 @@ export default class UsersController {
                 .subject('Validation')
                 .htmlView('validation', {
                     user: { name: newUser.name },
-                    url: `localhost:3333/validation/${registeredUser.id}`
+                    url: `http://localhost:3333/validation/${registeredUser.id}`
                 })
-                //doraditi htmlView tako da click here otvara novi tab, odnosno da salje get request
         })
 
         return response.ok('User registered')
@@ -91,39 +89,28 @@ export default class UsersController {
         }
     }
 
-    public async friendsList({user}){
-        const friendsList = await Friendship.query().select('friend_id').where('user_id', user.id)
+    public async getFriendsList({user}:HttpContextContract){
+        const friendsList = await Friendship.query().where('userId', user.id).preload('friend')
         return friendsList
-        //potrebno dovršiti
     }
 
     public async post({request, response, user}:HttpContextContract){
         const new_post = new Post()
         new_post.description = request.input('description')
-        new_post.likes = 0
         new_post.userId = user.id
         const image = request.file('image')
         if (image){
-            let imageName = 'image' + '.' + `${image.extname}`
-            const imagetUrl = await Drive.getUrl(imageName)
-            const existance = await Post.query().where('image', imagetUrl).first()
-            if (existance){
-                var i:number = 1
-                var existing: Post | null = existance
-                while(existing!){
-                    let newImageName = 'image' + `${i}` + '.' + `${image.extname}`
-                    let newImagetUrl = await Drive.getUrl(newImageName)
-                    var existing = await Post.query().where('image', newImagetUrl).first()
-                    imageName = newImageName
-                    i++
-                }
-            }
-            await image.moveToDisk("",{name: imageName})
-            new_post.image = await Drive.getUrl(imageName)
+            await image.moveToDisk('')
+            new_post.image = image.fileName
         }
         await new_post.save()
         return response.ok(new_post)
     }
+
+    public async getPostsList({user}:HttpContextContract){
+        const postsList = await Post.query().where('userId', user.id).preload('author')
+        return postsList
+    }//vježba - preload
 
     public async like({params, response}:HttpContextContract){
         const likedPost = await Post.findByOrFail('post_id', params.post_id)
