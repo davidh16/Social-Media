@@ -10,7 +10,7 @@ export default class extends BaseSchema {
       table.string('surname').notNullable
       table.string('password').notNullable
       table.string('email').unique().notNullable
-      table.boolean('validated')
+      table.boolean('validated').defaultTo(false)
       /**
 
       /**

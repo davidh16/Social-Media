@@ -36,7 +36,6 @@
       "@adonisjs/mail",
       "@adonisjs/view",
       "@adonisjs/ally",
-      "@adonisjs/limiter"
     ]
   }
 }

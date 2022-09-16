@@ -9,6 +9,7 @@ import Env from '@ioc:Adonis/Core/Env'
 import { DatabaseConfig } from '@ioc:Adonis/Lucid/Database'
 
 const databaseConfig: DatabaseConfig = {
+  
   /*
   |--------------------------------------------------------------------------
   | Connection
@@ -33,6 +34,7 @@ const databaseConfig: DatabaseConfig = {
     | npm i pg
     |
     */
+    
     pg: {
       client: 'pg',
       connection: {
@@ -53,3 +55,5 @@ const databaseConfig: DatabaseConfig = {
 }
 
 export default databaseConfig
+
+
