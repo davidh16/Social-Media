@@ -25,20 +25,39 @@ Route.post('/register', 'UsersController.register')
 
 Route.post('/login', 'UsersController.login')
 
-Route.post('/addfriend/:friend_id', 'UsersController.addFriend').middleware('auth')
-
 Route.get('/users/me', 'UsersController.me').middleware('auth')
-
-Route.delete('/deletefriend/:friend_id', 'UsersController.deletefriend').middleware('auth')
 
 Route.post('/logout', 'UsersController.logout').middleware('auth')
 
-Route.get('/friendslist', 'UsersController.getFriendsList').middleware('auth')
-
-Route.post('/post', 'UsersController.post').middleware('auth')
-
-Route.put('/like/:post_id', 'UsersController.like').middleware('auth')
-
-Route.get('/postslist', 'UsersController.getPostsList').middleware('auth')
-
 Route.get('/validation/:userId', 'UsersController.validate')
+
+Route.put('/update', 'UsersController.profileUpdate').middleware('auth')
+
+Route.delete('/deactivate', 'UsersController.deactivate').middleware('auth')
+
+
+
+Route.post('/addfriend/:friend_id', 'FriendsController.addFriend').middleware('auth')
+
+Route.delete('/deletefriend/:friend_id', 'FriendsController.deleteFriend').middleware('auth')
+
+Route.get('/friendslist', 'FriendsController.getFriendsList').middleware('auth')
+
+
+
+Route.post('/post', 'PostsController.post').middleware('auth')
+
+Route.put('/like/:post_id', 'PostsController.like').middleware('auth')
+
+Route.put('/postupdate/:post_id', 'PostsController.postUpdate').middleware('auth')
+
+Route.get('/:post_id/likes', 'PostsController.getPostLikedByList').middleware('auth')
+
+Route.get('/postslist', 'PostsController.getMyPostsList').middleware('auth')
+
+Route.delete('/postdelete/:post_id', 'PostsController.deletePost').middleware('auth')
+
+
+// Route.get('/google/redirect', 'UsersController.socialAuthenticationRedirect')
+
+// Route.get('/google/callback', 'UsersController.socialAuthenticationCallback')

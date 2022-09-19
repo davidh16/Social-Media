@@ -63,6 +63,7 @@
     "@adonisjs/session": "^6.4.0",
     "@adonisjs/view": "^6.2.0",
     "@phc/argon2": "^1.0.9",
+    "argon2": "^0.29.1",
     "luxon": "^3.0.3",
     "pg": "^8.8.0",
     "phc-bcrypt": "^1.0.7",

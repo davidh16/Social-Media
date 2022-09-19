@@ -1,11 +1,15 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, belongsTo, BelongsTo, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, column, manyToMany, ManyToMany} from '@ioc:Adonis/Lucid/Orm'
 import User from 'App/Models/User'
-import Like from './Like'
+
 
 export default class Post extends BaseModel {
-  @hasMany(() => Like)
-  public likes: HasMany<typeof Like>
+  @manyToMany(() => User,{
+    pivotTable:'likes',
+    pivotForeignKey:'post_id',
+    pivotRelatedForeignKey:'user_id'
+  })
+  public likes: ManyToMany<typeof User>
 
   @column({ isPrimary: true })
   public postId: number
@@ -27,7 +31,4 @@ export default class Post extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
-
-  @belongsTo(() => User)
-  public author: BelongsTo<typeof User>
 }
