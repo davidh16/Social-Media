@@ -8,9 +8,11 @@ export default class extends BaseSchema {
       table.increments('id').primary()
       table.string('name').notNullable
       table.string('surname').notNullable
-      table.string('password').notNullable
+      table.string('password').nullable
       table.string('email').unique().notNullable
       table.boolean('validated').defaultTo(false)
+      table.string('provider').nullable
+      table.string('provider_id').nullable
       /**
 
       /**

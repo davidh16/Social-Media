@@ -1,7 +1,7 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import PostValidator from 'App/Validators/PostValidator'
 import Post from 'App/Models/Post'
-import Like from 'App/Models/Like'
+import User from 'App/Models/User'
 
 export default class PostsController {
     public async post({request, response, user}:HttpContextContract){
@@ -45,29 +45,32 @@ export default class PostsController {
     }
 
     public async like({params, response, user}:HttpContextContract){
-
-        const likes = await Like.query().where('postId', params.post_id).preload('likedby')
-        const peopleWhoLiked = likes.map((item) => {
-            return item.likedby.email
-        })
-        if(peopleWhoLiked.includes(user.email)){
+        const likedPost = await Post.query().where('postId', params.post_id).preload('likes').first()
+        const friendsList = await User.query().where('id', user.id).preload('friends').first()
+        if(!(friendsList!['friends'].map(friend => friend.id).includes(likedPost!.userId))){
+            return response.forbidden('You can not like posts of users that are not your friends')
+        }
+        if(likedPost!['likes'].map(likedBy => likedBy.email).includes(user.email)){
             return response.forbidden('Already liked')
         }
-        const likedPost = await Post.findByOrFail('postId', params.post_id)
-        likedPost.numberOfLikes++
-        await likedPost.save()
-        const like = new Like
-        like.userId = user.id,
-        like.postId = params.post_id
-        await like.save()
-        return response.ok('Liked')
+        if(likedPost){
+            likedPost.numberOfLikes++
+            await likedPost.save()
+            await likedPost!.related('likes').attach([user.id])
+            return response.ok('Post liked')
+        }
+        return response.notFound('Post not found')
     }
 
-    //getPostLikedByList
-    public async getPostLikedByList({params}:HttpContextContract){
-        const likedPost = await Post.findByOrFail('postId',params.post_id)
-        const likedByList = await likedPost.related('likes').query()
-        return likedByList
+    public async getPostLikedByList({params, response, user}:HttpContextContract){
+        const likedByList = await Post.query().where('postId', params.post_id).preload('likes').first()
+        const friendsList = await User.query().where('id', user.id).preload('friends').first()
+        if(likedByList && (likedByList.userId === user.id || (friendsList!['friends'].map(friend => friend.id).includes(likedByList!.userId)))){
+            return response.ok(likedByList)
+        }
+        if(!likedByList){
+            return response.notFound('Post not found')
+        }
+        return response.forbidden('You can not access to posts that are not yours or of users that are not your friends')
     }
-
 }

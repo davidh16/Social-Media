@@ -21,15 +21,6 @@ export default Env.rules({
   APP_NAME: Env.schema.string(),
   DRIVE_DISK: Env.schema.enum(['local'] as const),
   NODE_ENV: Env.schema.enum(['development', 'production', 'test'] as const),
-
-  //
-  S3_KEY: Env.schema.string(),
-  S3_SECRET: Env.schema.string(),
-  S3_BUCKET: Env.schema.string(),
-  S3_REGION: Env.schema.string(),
-  S3_ENDPOINT: Env.schema.string.optional(),
-  //
-
   //
   SMTP_HOST: Env.schema.string({ format: 'host' }),
   SMTP_PORT: Env.schema.number(),
@@ -38,8 +29,8 @@ export default Env.rules({
   //
 
   //
-  GOOGLE_CLIENT_ID: Env.schema.string(),
-  GOOGLE_CLIENT_SECRET: Env.schema.string(),
+  GITHUB_CLIENT_ID: Env.schema.string(),
+  GITHUB_CLIENT_SECRET: Env.schema.string(),
   //
   
   DB_CONNECTION: Env.schema.string(),

@@ -20,14 +20,14 @@ import { AllyConfig } from '@ioc:Adonis/Addons/Ally'
 const allyConfig: AllyConfig = {
 	/*
 	|--------------------------------------------------------------------------
-	| Google driver
+	| Github driver
 	|--------------------------------------------------------------------------
 	*/
-	google: {
-		driver: 'google',
-		clientId: Env.get('GOOGLE_CLIENT_ID'),
-		clientSecret: Env.get('GOOGLE_CLIENT_SECRET'),
-		callbackUrl: 'http://localhost:3333/google/callback',
+	github: {
+		driver: 'github',
+		clientId: Env.get('GITHUB_CLIENT_ID'),
+		clientSecret: Env.get('GITHUB_CLIENT_SECRET'),
+		callbackUrl: 'http://localhost:3333/github/callback',
 	},
 }
 

@@ -31,14 +31,12 @@ export default class FriendsController {
         return response.notFound('Friend not found')
     }
 
-    public async getFriendsList({user}:HttpContextContract){
-        const friendsList = await user.related('friends').query()
-        return friendsList.map((item) => {
-            return {
-                name: item.name,
-                surname: item.surname,
-                email: item.email,
-            }
-        })
+    public async getFriendsList({user, response}:HttpContextContract){
+        const friendsList = await User.query().where('id', user.id).preload('friends').first()
+        if(friendsList){
+            return response.ok(friendsList)
+        }
+        return response.notFound('Post not found')
+        }
     }
-}
+
