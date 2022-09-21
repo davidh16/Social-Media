@@ -11,6 +11,9 @@ export default class User extends BaseModel {
   })
   public friends: ManyToMany<typeof User>
 
+  @hasMany(()=>Post)
+  public posts: HasMany<typeof Post>
+  
   @column({ isPrimary: true })
   public id: number
 

@@ -31,8 +31,15 @@ export default class FriendsController {
         return response.notFound('Friend not found')
     }
 
+    public async getFriend({response, params, user}:HttpContextContract){
+        const friend = await User.query().where('id', user.id).preload('friends',(builder) => {
+            builder.where('id', params.friend_id)
+        })
+        return response.ok(friend)
+        }
+        
     public async getFriendsList({user, response}:HttpContextContract){
-        const friendsList = await User.query().where('id', user.id).preload('friends').first()
+        const friendsList = await User.query().where('id', user.id).preload('friends')
         if(friendsList){
             return response.ok(friendsList)
         }

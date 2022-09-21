@@ -45,6 +45,8 @@ Route.post('/addfriend/:friend_id', 'FriendsController.addFriend').middleware('a
 
 Route.delete('/deletefriend/:friend_id', 'FriendsController.deleteFriend').middleware('auth')
 
+Route.get('/friend/:friend_id','FriendsController.getFriend').middleware('auth')
+
 Route.get('/friendslist', 'FriendsController.getFriendsList').middleware('auth')
 
 
@@ -53,11 +55,15 @@ Route.post('/post', 'PostsController.post').middleware('auth')
 
 Route.put('/like/:post_id', 'PostsController.like').middleware('auth')
 
+Route.put('dislike/:post_id', 'PostsController.dislike').middleware('auth')
+
 Route.put('/postupdate/:post_id', 'PostsController.postUpdate').middleware('auth')
 
 Route.get('/likes/:post_id', 'PostsController.getPostLikedByList').middleware('auth')
 
 Route.get('/postslist', 'PostsController.getMyPostsList').middleware('auth')
+
+Route.get('/postslist/:friend_id','PostsController.getFriendsPostsList').middleware('auth')
 
 Route.delete('/postdelete/:post_id', 'PostsController.deletePost').middleware('auth')
 
