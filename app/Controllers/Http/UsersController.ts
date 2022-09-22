@@ -11,15 +11,19 @@ import Redis from '@ioc:Adonis/Addons/Redis'
 export default class UsersController {
     public async register({ request, response, auth }: HttpContextContract) {
         const validData = await request.validate(RegisterValidator)
+
         const newUser = new User()
         newUser.name = validData.name
         newUser.surname = validData.surname
         newUser.email = validData.email
         newUser.password = validData.password
         await newUser.save()
+
         const registeredUser = await User.query().where('email', newUser.email).firstOrFail()
-        const validation_token = await auth.use('api').generate(registeredUser)
-        await Redis.connection('local2').set(validation_token.token, registeredUser.id)
+
+        const vaidationToken = await auth.use('api').generate(registeredUser)
+        await Redis.connection('local2').set(vaidationToken.token, registeredUser.id)
+
         await Mail.send((message) => {
             message
                 .from('socialmedia@example.com')
@@ -27,17 +31,18 @@ export default class UsersController {
                 .subject('Validation')
                 .htmlView('validation', {
                     user: { name: newUser.name },
-                    url: Env.get('VALIDATION_URL') + validation_token.token
+                    url: Env.get('VALIDATION_URL') + vaidationToken.token
                 })
         })
         return response.ok('User registered')
     }
 
-    public async validate({params,response}:HttpContextContract){
+    public async verifyUser({params,response}:HttpContextContract){
         const retirevedId = await Redis.connection('local2').get(`${params.validation_token}`)
+
         if(retirevedId){
             const usertToValidate = await User.findByOrFail('id', retirevedId)
-            usertToValidate.validated = true
+            usertToValidate.verified = true
             await usertToValidate.save()
             return response.ok("Validation successful")
         }
@@ -46,7 +51,7 @@ export default class UsersController {
 
     public async login({ auth, request, response}: HttpContextContract) {
         const currentUser = await User.findByOrFail('email', request.body().email)
-        if (currentUser.validated === false){
+        if (currentUser.verified === false){
             return response.notFound('Validation of email adress is needed')
         }
         if (await Hash.verify(currentUser.password!, request.body().password)) {
@@ -81,7 +86,7 @@ export default class UsersController {
         },
         {
             name: githubUser.nickName,
-            validated: true,
+            verified: true,
             provider: 'github',
             providerId: githubUser.id
         })
@@ -90,6 +95,7 @@ export default class UsersController {
 
     public async profileUpdate({user, response, request}:HttpContextContract){
         const validData = await request.validate(UpdateValidator)
+
         user.name = validData.name
         user.surname = validData.surname
         user.password = validData.password
@@ -112,9 +118,7 @@ export default class UsersController {
           revoked: true
         }
     }
-
-    
-    }
+}
 
 
 

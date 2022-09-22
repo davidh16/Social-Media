@@ -5,9 +5,9 @@ export default class extends BaseSchema {
 
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('like_id').primary()
+      table.increments('id').primary()
       table.integer('user_id').references('users.id').onDelete('CASCADE')
-      table.integer('post_id').references('posts.post_id').onDelete('CASCADE')
+      table.integer('post_id').references('posts.id').onDelete('CASCADE')
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

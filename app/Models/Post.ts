@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, manyToMany, ManyToMany} from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, column, manyToMany, ManyToMany, belongsTo, BelongsTo} from '@ioc:Adonis/Lucid/Orm'
 import User from 'App/Models/User'
 
 export default class Post extends BaseModel {
@@ -12,8 +12,11 @@ export default class Post extends BaseModel {
   })
   public likes: ManyToMany<typeof User>
 
+  @belongsTo(()=> User)
+  public owner:BelongsTo<typeof User>
+
   @column({ isPrimary: true })
-  public postId: number
+  public id: number
 
   @column()
   public userId: number

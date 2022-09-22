@@ -1,7 +1,6 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, hasMany, HasMany, beforeSave, manyToMany, ManyToMany } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, column, beforeSave, manyToMany, ManyToMany} from '@ioc:Adonis/Lucid/Orm'
 import Hash from '@ioc:Adonis/Core/Hash'
-import Post from './Post'
 
 export default class User extends BaseModel {
   @manyToMany(() => User,{
@@ -9,11 +8,15 @@ export default class User extends BaseModel {
     pivotForeignKey:'user_id',
     pivotRelatedForeignKey:'friend_id'
   })
-  public friends: ManyToMany<typeof User>
+  public followers: ManyToMany<typeof User>
 
-  @hasMany(()=>Post)
-  public posts: HasMany<typeof Post>
-  
+  @manyToMany(() => User,{
+    pivotTable:'friendships',
+    pivotForeignKey:'friend_id',
+    pivotRelatedForeignKey:'user_id'
+  })
+  public following: ManyToMany<typeof User>
+
   @column({ isPrimary: true })
   public id: number
 
@@ -30,7 +33,7 @@ export default class User extends BaseModel {
   public password: string | null
 
   @column()
-  public validated: boolean
+  public verified: boolean
 
   @column()
   public provider: string | null
