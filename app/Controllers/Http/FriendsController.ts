@@ -43,7 +43,7 @@ export default class FriendsController {
         const limit = request.input('limit',5)
 
         const friendsList = await User.query().whereHas('following', (builder) => {
-            builder.where('id', user.id)
+            builder.where('user_id', user.id)
         }).paginate(page,limit) //probaj preload umjesto whereHas
 
         if(friendsList){

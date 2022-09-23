@@ -9,7 +9,7 @@ import Redis from '@ioc:Adonis/Addons/Redis'
 
 
 export default class UsersController {
-    public async register({ request, response, auth }: HttpContextContract) {
+    public async register({ request, response }: HttpContextContract) {
         const validData = await request.validate(RegisterValidator)
 
         const newUser = new User()
@@ -21,8 +21,10 @@ export default class UsersController {
 
         const registeredUser = await User.query().where('email', newUser.email).firstOrFail()
 
-        const vaidationToken = await auth.use('api').generate(registeredUser)
-        await Redis.connection('local2').set(vaidationToken.token, registeredUser.id)
+        var uuid = require("uuid");
+        var verification_id = uuid.v4();
+
+        await Redis.connection('local2').set(verification_id, registeredUser.id)
 
         await Mail.send((message) => {
             message
@@ -31,19 +33,20 @@ export default class UsersController {
                 .subject('Validation')
                 .htmlView('validation', {
                     user: { name: newUser.name },
-                    url: Env.get('VALIDATION_URL') + vaidationToken.token
+                    url: Env.get('VALIDATION_URL') + verification_id
                 })
         })
         return response.ok('User registered')
     }
 
     public async verifyUser({params,response}:HttpContextContract){
-        const retirevedId = await Redis.connection('local2').get(`${params.validation_token}`)
+        const retirevedId = await Redis.connection('local2').get(`${params.verification_id}`)
 
         if(retirevedId){
             const usertToValidate = await User.findByOrFail('id', retirevedId)
             usertToValidate.verified = true
             await usertToValidate.save()
+            Redis.connection('local2').del(params.verification_id)
             return response.ok("Validation successful")
         }
         return response.forbidden('Invalid validation key')

@@ -29,7 +29,7 @@ Route.get('/users/me', 'UsersController.me').middleware('auth')
 
 Route.post('/logout', 'UsersController.logout').middleware('auth')
 
-Route.get('/validation/:validation_token', 'UsersController.verifyUser')
+Route.get('/validation/:verification_id', 'UsersController.verifyUser')
 
 Route.put('/update', 'UsersController.profileUpdate').middleware('auth')
 

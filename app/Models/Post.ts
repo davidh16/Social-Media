@@ -5,7 +5,7 @@ import User from 'App/Models/User'
 export default class Post extends BaseModel {
   @manyToMany(() => User,{
     pivotTable:'likes',
-    localKey:'postId',
+    localKey:'id',
     relatedKey:"id",
     pivotForeignKey:'post_id',
     pivotRelatedForeignKey:'user_id'
