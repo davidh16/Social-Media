@@ -9,13 +9,13 @@ export default class FriendsController {
             return item.email
         })
         if (friendsList.includes(addedUser.email) || user.id === addedUser.id){
-            return response.forbidden('User is either you or already your friend')
+            return response.forbidden({message:'User is either you or already your friend'})
         }
         if(addedUser.verified === false){
-            return response.notFound('User not found')
+            return response.notFound({message:'User not found'})
         }
         await user.related('followers').attach([addedUser.id])
-        return response.ok(`${addedUser.name} has been added as a friend`)
+        return response.ok({message:`${addedUser.name} has been added as a friend`})
     }
 
     public async deleteFriend({ user, response, params }: HttpContextContract){
@@ -26,9 +26,9 @@ export default class FriendsController {
         })
         if (friendsList.includes(friend.email)){
             await user.related('followers').detach([friend.id])
-            return response.ok("Friend deleted")
+            return response.ok({message:"Friend deleted"})
         }
-        return response.notFound('Friend not found')
+        return response.notFound({message:'Friend not found'})
     }
 
     public async getFriend({response, params, user}:HttpContextContract){
@@ -49,6 +49,6 @@ export default class FriendsController {
         if(friendsList){
             return response.ok(friendsList)
         }
-        return response.notFound('No friends found')
+        return response.notFound({message:'No friends found'})
     } // uz listu prijatelja nisam uspio dobiti usera čiji su prijatelji
 }

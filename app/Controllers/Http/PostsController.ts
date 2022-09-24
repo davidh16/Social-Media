@@ -26,7 +26,7 @@ export default class PostsController {
         const postToUpdate = await Post.findByOrFail('id',params.post_id)
 
         if(postToUpdate.userId !== user.id){
-            return response.forbidden("Posts of other users can't be updated")
+            return response.forbidden({message:"Posts of other users can't be updated"})
         }
 
         const validData = await request.validate(PostValidator)
@@ -42,7 +42,7 @@ export default class PostsController {
             await postToDelete.delete()
             return response.ok('Post deleted')
         }
-        return response.forbidden('You can not delete posts of other users')
+        return response.forbidden({message:'You can not delete posts of other users'})
     }
     
     public async getMyPostsList({user,response, request}:HttpContextContract){
@@ -55,7 +55,7 @@ export default class PostsController {
         if(postsList){
             return response.ok(postsList)
         }
-        return response.notFound('No friends found')
+        return response.notFound({message:'No friends found'})
     } //uz listu postova nisam uspio dobiti i vlasnika postova
 
     public async getFriendsPostsList({user, response, params, request}:HttpContextContract){
@@ -70,44 +70,42 @@ export default class PostsController {
             if(friendsPosts.length !== 0){
                 return response.ok(friendsPosts)
             }
-            return response.notFound('Friend has no posts')
+            return response.notFound({message:'Friend has no posts'})
         }
-        return response.forbidden('You can not access to posts of users that are not your friends')
+        return response.forbidden({message:'You can not access to posts of users that are not your friends'})
     }
 
     public async like({params, response, user}:HttpContextContract){
-        const likedPost = await Post.query().where('id', params.post_id).preload('likes').first()
+        const likedPost = await Post.query().where('id', params.post_id).preload('likes').withCount('likes').first()
         if(!likedPost){
-            return response.notFound('Post not found')
+            return response.notFound({message:'Post not found'})
         }
-        if(likedPost!.numberOfLikes !== 0){
+        if(likedPost!.$extras.likes !== 0 ){
             if(likedPost!['likes'].map(likedBy => likedBy.email).includes(user.email)){
-                return response.redirect().toPath(`/dislike/${params.post_id}`)
+                return response.forbidden({message:'Already liked'})
             } 
         }
         const friendsList = await User.query().where('id', user.id).preload('followers').first()
         if((friendsList!.followers.map(friend => friend.id).includes(likedPost!.userId)) || likedPost.userId === user.id){
-            likedPost.numberOfLikes++
             await likedPost.save()
             await likedPost!.related('likes').attach([user.id])
-            return response.ok('Post liked')
+            return response.ok({message:'Post liked'})
         }
         if(!(friendsList!.followers.map(friend => friend.id).includes(likedPost!.userId))){
-            return response.forbidden('You can not like posts of users that are not your friends')
+            return response.forbidden({message:'You can not like posts of users that are not your friends'})
         }
     }
 
     public async dislike({params, response, user}:HttpContextContract){
-        const dislikedPost = await Post.query().where('id', params.post_id).preload('likes').first()
+        const dislikedPost = await Post.query().where('id', params.post_id).preload('likes').withCount('likes').first()
         if(!dislikedPost){
-            return response.notFound('Post not found')
+            return response.notFound({message:'Post not found'})
         }
-        if(dislikedPost!.numberOfLikes !== 0){
+        if(dislikedPost!.$extras.likes !== 0){
             if(dislikedPost!.likes.map(likedBy => likedBy.email).includes(user.email)){
-                dislikedPost.numberOfLikes--
                 await dislikedPost.save()
                 await dislikedPost!.related('likes').detach([user.id])
-                return response.ok('Post disliked')
+                return response.ok({message:'Post disliked'})
             } 
         }
     }
@@ -119,8 +117,8 @@ export default class PostsController {
             return response.ok(likedByList)
         }
         if(!likedByList){
-            return response.notFound('Post not found')
+            return response.notFound({message:'Post not found'})
         }
-        return response.forbidden('You can not access to posts that are not yours or of users that are not your friends')
+        return response.forbidden({message:'You can not access to posts that are not yours or of users that are not your friends'})
     } // nisam uspio napraviti paginaciju
 }

@@ -36,7 +36,7 @@ export default class UsersController {
                     url: Env.get('VALIDATION_URL') + verification_id
                 })
         })
-        return response.ok('User registered')
+        return response.ok(registeredUser)
     }
 
     public async verifyUser({params,response}:HttpContextContract){
@@ -47,15 +47,15 @@ export default class UsersController {
             usertToValidate.verified = true
             await usertToValidate.save()
             Redis.connection('local2').del(params.verification_id)
-            return response.ok("Validation successful")
+            return response.ok({message: "Your account has been verified successfuly"})
         }
-        return response.forbidden('Invalid validation key')
+        return response.forbidden({message: "Invalid verification key"})
     }
 
     public async login({ auth, request, response}: HttpContextContract) {
         const currentUser = await User.findByOrFail('email', request.body().email)
         if (currentUser.verified === false){
-            return response.notFound('Validation of email adress is needed')
+            return response.notFound({message:"Verification of email adress is needed"})
         }
         if (await Hash.verify(currentUser.password!, request.body().password)) {
             const token = await auth.use('api').generate(currentUser, {
@@ -64,7 +64,7 @@ export default class UsersController {
             return token.toJSON()
           }
         else {
-            return response.unauthorized('Invalid credentials')
+            return response.unauthorized({message:"Invalid credentials"})
         }
     }
 
@@ -75,10 +75,10 @@ export default class UsersController {
     public async socialAuthenticationCallback ({ally, response, auth}:HttpContextContract){
         const github = ally.use('github')
         if (github.accessDenied()){
-            return response.forbidden('Access denied')
+            return response.forbidden({message:"Access denied"})
         }
         if (github.stateMisMatch()){
-            return response.forbidden('Request expired. Retry again')
+            return response.forbidden({message:"Request expired. Retry again."})
         }
         if (github.hasError()){
             return github.getError()
@@ -108,7 +108,7 @@ export default class UsersController {
 
     public async deactivate({user,response}:HttpContextContract){
         await user.delete()
-        return response.ok('Your account has been deactivated')
+        return response.ok({message:"Your account has been deativated"})
     }
 
     public async me({ user, response }: HttpContextContract){

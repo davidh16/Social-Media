@@ -22,9 +22,6 @@ export default class Post extends BaseModel {
   public userId: number
 
   @column()
-  public numberOfLikes: number
-
-  @column()
   public description: string
 
   @column()
